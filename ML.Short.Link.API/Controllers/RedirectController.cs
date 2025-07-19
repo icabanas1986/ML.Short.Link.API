@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ML.Short.Link.API.Services;
 
 namespace ML.Short.Link.API.Controllers
 {
@@ -6,16 +8,21 @@ namespace ML.Short.Link.API.Controllers
     [Route("")]
     public class RedirectController : ControllerBase
     {
+        private readonly UrlShortenerService _shortener;
+        public RedirectController(UrlShortenerService shortener)
+        {
+            _shortener = shortener;
+        }
+
         [HttpGet("{shortCode}")]
         public async Task<IActionResult> RedirectUrl(string shortCode)
         {
-            //var url = await _db.ShortUrls.FirstOrDefaultAsync(u => u.ShortCode == shortCode);
-            //if (url == null) return NotFound();
-
-            //url.ClickCount++;
-            //await _db.SaveChangesAsync();
-
-            return Redirect("https://localhost:7105/swagger/index.html");
+            var url = await _shortener.ObtenerUrlOriginalAsync(shortCode);
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return NotFound();
+            }
+            return Redirect(url);
         }
     }
 }
