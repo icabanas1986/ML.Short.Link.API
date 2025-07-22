@@ -1,4 +1,5 @@
-﻿using ML.Short.Link.API.Data;
+﻿using ML.Short.Link.API.Data.Interfaz;
+using ML.Short.Link.API.Models;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -20,13 +21,13 @@ namespace ML.Short.Link.API.Services
                 .Select(s => s[_random.Next(s.Length)]).ToArray());
         }
 
-        public async Task<int> InsertaUrlAsync(string originalUrl, string shortCode)
+        public async Task<int> InsertaUrlAsync(ShortUrl shortUrl)
         {
-            if (string.IsNullOrWhiteSpace(originalUrl) || string.IsNullOrWhiteSpace(shortCode))
+            if (string.IsNullOrWhiteSpace(shortUrl.OriginalUrl) || string.IsNullOrWhiteSpace(shortUrl.ShortCode))
             {
                 throw new ArgumentException("Original URL and short code cannot be null or empty.");
             }
-            return await _db.InsertarUrlAsync(originalUrl, shortCode);
+            return await _db.InsertarUrlAsync(shortUrl.OriginalUrl, shortUrl.ShortCode, shortUrl.IdUser);
         }
 
         public async Task<string> ObtenerUrlOriginalAsync(string shortCode)

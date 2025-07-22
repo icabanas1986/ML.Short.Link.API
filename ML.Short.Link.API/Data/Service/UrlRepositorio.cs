@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
+using ML.Short.Link.API.Data.Interfaz;
 
-namespace ML.Short.Link.API.Data
+namespace ML.Short.Link.API.Data.Service
 {
     public class UrlRepositorio : IUrlRepositorio
     {
@@ -10,16 +11,17 @@ namespace ML.Short.Link.API.Data
             _conn = conn;
         }
 
-        public async Task<int> InsertarUrlAsync(string originalUrl, string shortCode)
+        public async Task<int> InsertarUrlAsync(string originalUrl, string shortCode,int idUser)
         {
-            var query = "INSERT INTO Urls (UrlOriginal, UrlCorta,fecha_creacion,clicks,activa) " +
-                "OUTPUT INSERTED.idUrl VALUES (@OriginalUrl, @ShortCode,@fechaCreacion,@clicks,@activa)";
+            var query = "INSERT INTO Urls (UrlOriginal, UrlCorta,fecha_creacion,clicks,activa,UserId) " +
+                "OUTPUT INSERTED.idUrl VALUES (@OriginalUrl, @ShortCode,@fechaCreacion,@clicks,@activa,@userId)";
             using var command = new SqlCommand(query, _conn);
             command.Parameters.AddWithValue("@OriginalUrl", originalUrl);
             command.Parameters.AddWithValue("@ShortCode", shortCode);
             command.Parameters.AddWithValue("@fechaCreacion", DateTime.UtcNow);
             command.Parameters.AddWithValue("@clicks", 0);
             command.Parameters.AddWithValue("@activa", true);
+            command.Parameters.AddWithValue("@userId", idUser);
 
             await _conn.OpenAsync();
             var id = (int)await command.ExecuteScalarAsync();
