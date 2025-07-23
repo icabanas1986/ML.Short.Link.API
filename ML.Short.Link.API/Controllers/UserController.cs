@@ -59,5 +59,22 @@ namespace ML.Short.Link.API.Controllers
 
             return Ok(new { Token = token });
         }
+
+        [HttpPost("token")]
+        public async Task<IActionResult> GetUserToken(string email)
+        {
+            // Aquí iría la lógica para obtener el token del usuario
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest("Email es obligatorio.");
+            }
+            var user = await _user.ObtieneUsuario(email); // Aquí deberías manejar el resultado y posibles excepciones
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+            var token = _jwt.generaToken(user.Email); // Genera el token JWT
+            return Ok(new { Token = token });
+        }
     }
 }
