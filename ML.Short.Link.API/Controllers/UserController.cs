@@ -60,7 +60,7 @@ namespace ML.Short.Link.API.Controllers
             return Ok(new { Token = token });
         }
 
-        [HttpPost("token")]
+        [HttpPost("generandoToken")]
         public async Task<IActionResult> GetUserToken(string email)
         {
             // Aquí iría la lógica para obtener el token del usuario
