@@ -1,32 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ML.Short.Link.API.Data;
 using ML.Short.Link.API.Models;
 using ML.Short.Link.API.Services;
 
 namespace ML.Short.Link.API.Controllers
 {
     [ApiController]
-    [Route("api/urls")]
-    public class UrlController : Controller
+    [Route("short")]
+    public class UrlController : ControllerBase
     {
         private readonly UrlShortenerService _shortener;
-
         public UrlController( UrlShortenerService shortener)
         {
             _shortener = shortener;
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> ShortenUrl([FromBody] string originalUrl)
         {
+            
+
             var shortCode = _shortener.GenerateShortCode();
             var shortUrl = new ShortUrl
             {
                 OriginalUrl = originalUrl,
-                ShortCode = shortCode
+                ShortCode = shortCode,
+                IdUser = 1,
             };
 
-            //_db.ShortUrls.Add(shortUrl);
-            //await _db.SaveChangesAsync();
+            var idUrl = await _shortener.InsertaUrlAsync(shortUrl);
 
             return Ok(new { shortUrl = $"https://lish.io/{shortCode}" });
         }
