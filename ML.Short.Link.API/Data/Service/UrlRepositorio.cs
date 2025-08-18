@@ -1,5 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using ML.Short.Link.API.Data.Interfaz;
+using ML.Short.Link.API.Models;
+using System.Reflection.PortableExecutable;
 
 namespace ML.Short.Link.API.Data.Service
 {
@@ -11,7 +13,7 @@ namespace ML.Short.Link.API.Data.Service
             _conn = conn;
         }
 
-        public async Task<int> InsertarUrlAsync(string originalUrl, string shortCode,int idUser)
+        public async Task<int> InsertarUrlAsync(string originalUrl, string shortCode, int idUser)
         {
             var query = "INSERT INTO Urls (UrlOriginal, UrlCorta,fecha_creacion,clicks,activa,UserId) " +
                 "OUTPUT INSERTED.idUrl VALUES (@OriginalUrl, @ShortCode,@fechaCreacion,@clicks,@activa,@userId)";
@@ -29,17 +31,6 @@ namespace ML.Short.Link.API.Data.Service
             return id;
         }
 
-        public async Task<string> ObtenerUrlOriginalAsync(string shortCode)
-        {
-            var query = "SELECT UrlOriginal FROM Urls WHERE UrlCorta = @ShortCode";
-            using var command = new SqlCommand(query, _conn);
-            command.Parameters.AddWithValue("@ShortCode", shortCode);
-            await _conn.OpenAsync();
-            var result = await command.ExecuteScalarAsync();
-            await _conn.CloseAsync();
-            return result as string;
-        }
-
         public async Task IncrementarClickCountAsync(string shortCode)
         {
             var query = "UPDATE Urls SET clicks = clicks + 1 WHERE UrlCorta = @ShortCode";
@@ -50,6 +41,22 @@ namespace ML.Short.Link.API.Data.Service
             await _conn.CloseAsync();
         }
 
+        public async Task<int> InsertStats(UrlClicks urlClicks)
+        {
+            var query = "INSERT INTO UrlClicks (UrlId,ClickedAt,IPAddress,UserAgent,Country,DeviceType) " +
+                "OUTPUT INSERTED.Id VALUES (@UrlId, @ClickedAt, @IPAddress, @UserAgent, @Country, @DeviceType)";
+            using var command = new SqlCommand(query, _conn);
+            command.Parameters.AddWithValue("@UrlId", urlClicks.UrlId);
+            command.Parameters.AddWithValue("@ClickedAt", urlClicks.ClickedAt);
+            command.Parameters.AddWithValue("@IPAddress", urlClicks.IPAddress ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@UserAgent", urlClicks.UserAgent ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Country", urlClicks.Country ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@DeviceType", urlClicks.DeviceType ?? (object)DBNull.Value);
+            await _conn.OpenAsync();
+            var id = (int)await command.ExecuteNonQueryAsync();
+            await _conn.CloseAsync();
+            return id;
+        }
         public async Task<bool> ExisteUrlAsync(string shortCode)
         {
             var query = "SELECT COUNT(*) FROM Urls WHERE UrlCorta = @ShortCode";
@@ -59,6 +66,55 @@ namespace ML.Short.Link.API.Data.Service
             var count = (int)await command.ExecuteScalarAsync();
             await _conn.CloseAsync();
             return count > 0;
+        }
+
+        public async Task<List<ShortUrl>> ObtenerUrlsPorUsuarioAsync(int userId)
+        {
+            var urls = new List<ShortUrl>();
+            await _conn.OpenAsync();
+            var query = "SELECT IdUrl, UrlOriginal, UrlCorta, fecha_creacion,clicks,UserId FROM Urls WHERE UserId = @UserId";
+            using (var command = new SqlCommand(query, _conn))
+            {
+                command.Parameters.AddWithValue("@UserId", userId);
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        urls.Add(new ShortUrl
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("idUrl")),
+                            OriginalUrl = reader.GetString(reader.GetOrdinal("UrlOriginal")),
+                            ShortCode = reader.GetString(reader.GetOrdinal("UrlCorta")),
+                            CreatedAt = reader.GetDateTime(reader.GetOrdinal("fecha_creacion")),
+                            ClickCount = reader.GetInt32(reader.GetOrdinal("clicks")),
+                            IdUser = reader.GetInt32(reader.GetOrdinal("UserId"))
+                        });
+                    }
+                }
+            }
+            await _conn.CloseAsync();
+            return urls;
+        }
+        public async Task<ShortUrl> ObtenerUrlOriginalAsync(string shortCode)
+        {
+            var query = "SELECT idUrl,UrlOriginal FROM Urls WHERE UrlCorta = @ShortCode";
+            using var command = new SqlCommand(query, _conn);
+            ShortUrl? shortUrl = null;
+            await _conn.OpenAsync();
+            command.Parameters.AddWithValue("@ShortCode", shortCode);
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                shortUrl = new ShortUrl
+                {
+                    Id = reader.GetInt32(reader.GetOrdinal("idUrl")),
+                    OriginalUrl = reader.GetString(reader.GetOrdinal("UrlOriginal")),
+                    ShortCode = shortCode
+                };
+            }
+            
+            await _conn.CloseAsync();
+            return shortUrl;
         }
     }
 }

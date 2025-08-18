@@ -8,5 +8,6 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int ClickCount { get; set; } = 0;
         public int IdUser { get; set; }
+       
     }
 }
