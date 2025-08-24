@@ -25,7 +25,7 @@ namespace ML.Short.Link.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser(string email, string password)
+        public async Task<IActionResult> RegisterUser(string nombre, string email, string password)
         {
             // Aquí iría la lógica para registrar un usuario
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
@@ -34,7 +34,7 @@ namespace ML.Short.Link.API.Controllers
             }
             password = _passwordHasher.HashPassword(password);
 
-            var idUser = await _user.InsertarUsuarioAsync(email, password); // Aquí deberías manejar el resultado y posibles excepciones
+            var idUser = await _user.InsertarUsuarioAsync(nombre,email, password); // Aquí deberías manejar el resultado y posibles excepciones
             // Por ejemplo, guardar el usuario en la base de datos
             return Ok(new { Message = "Usuario registrado correctamente" });
         }

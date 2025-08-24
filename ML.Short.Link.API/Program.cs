@@ -9,6 +9,7 @@ using ML.Short.Link.API.Services;
 using ML.Short.Link.API.Utils;
 using System.Text;
 using MaxMind.GeoIP2;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<jwtServices>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UrlShortenerService>();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 var geoIpDbPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "GeoLite2-City.mmdb");
 if (File.Exists(geoIpDbPath))
@@ -89,6 +95,13 @@ var secretKey = jwtSettings["SecretKey"];
             ValidateAudience = false // Para desarrollo
         };
     });
+
+//Log.Logger = new LoggerConfiguration()
+//    .WriteTo.Console()
+//    .WriteTo.File("Logger/log-.txt", rollingInterval: RollingInterval.Day)
+//    .CreateLogger();
+
+//builder.Host.UseSerilog();
 
 builder.Services.AddAuthorization();
 

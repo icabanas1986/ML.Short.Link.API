@@ -4,7 +4,7 @@ namespace ML.Short.Link.API.Data.Interfaz
 {
     public interface IUserRepositorio
     {
-        Task<int> RegistrarUsuarioAsync(string email, string password);
+        Task<int> RegistrarUsuarioAsync(string nombre, string email, string password);
 
         Task<bool> ValidarUsuarioAsync(string email, string password);
 

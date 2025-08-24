@@ -13,6 +13,21 @@ namespace ML.Short.Link.API.Data.Service
             _conn = conn;
         }
 
+        //public async Taks<int> InsertaUrlFreeAsync(string originalUrl, string shortCode)
+        //{
+        //    var query = "INSERT INTO Urls (UrlOriginal, UrlCorta,fecha_creacion,clicks,activa) " +
+        //        "OUTPUT INSERTED.idUrl VALUES (@OriginalUrl, @ShortCode,@fechaCreacion,@clicks,@activa)";
+        //    using var command = new SqlCommand(query, _conn);
+        //    command.Parameters.AddWithValue("@OriginalUrl", originalUrl);
+        //    command.Parameters.AddWithValue("@ShortCode", shortCode);
+        //    command.Parameters.AddWithValue("@fechaCreacion", DateTime.UtcNow);
+        //    command.Parameters.AddWithValue("@clicks", 0);
+        //    command.Parameters.AddWithValue("@activa", true);
+        //    await _conn.OpenAsync();
+        //    var id = (int)await command.ExecuteScalarAsync();
+        //    await _conn.CloseAsync();
+        //    return id;
+        //}
         public async Task<int> InsertarUrlAsync(string originalUrl, string shortCode, int idUser)
         {
             var query = "INSERT INTO Urls (UrlOriginal, UrlCorta,fecha_creacion,clicks,activa,UserId) " +

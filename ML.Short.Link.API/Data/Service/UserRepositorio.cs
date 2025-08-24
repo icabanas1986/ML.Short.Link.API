@@ -12,11 +12,12 @@ namespace ML.Short.Link.API.Data.Service
             _conn = conn;
         }
 
-        public async Task<int> RegistrarUsuarioAsync(string email, string password)
+        public async Task<int> RegistrarUsuarioAsync(string nombre,string email, string password)
         {
-            var query = "INSERT INTO Users (Email, PasswordHash, CreatedAt) " +
-                        "OUTPUT INSERTED.Id VALUES (@Email, @Password, @FechaRegistro)";
+            var query = "INSERT INTO Users (Name,Email, PasswordHash, CreatedAt) " +
+                        "OUTPUT INSERTED.Id VALUES (@Name,@Email, @Password, @FechaRegistro)";
             using var command = new SqlCommand(query, _conn);
+            command.Parameters.AddWithValue("@Name", nombre); // Assuming Name is the same as Email for registration
             command.Parameters.AddWithValue("@Email", email);
             command.Parameters.AddWithValue("@Password", password); // Consider hashing the password
             command.Parameters.AddWithValue("@FechaRegistro", DateTime.UtcNow);

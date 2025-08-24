@@ -13,10 +13,12 @@ namespace ML.Short.Link.API.Controllers
     {
         private readonly UrlShortenerService _shortener;
         private readonly IHttpContextAccessor _context;
+        //private readonly ILogger<RedirectController> _logger;
         public RedirectController(UrlShortenerService shortener, IHttpContextAccessor context)
         {
             _shortener = shortener;
             _context = context;
+            
         }
 
         [HttpGet("{shortCode}")]
@@ -25,7 +27,9 @@ namespace ML.Short.Link.API.Controllers
             UrlClicks urlClicks = new UrlClicks();
 
             urlClicks.IPAddress = _context.HttpContext?.Connection.RemoteIpAddress?.ToString();
+            //_logger.LogInformation("Obteniendo IP:" + urlClicks.IPAddress, "Redirect", DateTime.UtcNow);
             urlClicks.UserAgent = Request.Headers["User-Agent"].ToString();
+            //_logger.LogInformation("Obteniendo UserAgent:" + urlClicks.UserAgent, "Redirect", DateTime.UtcNow);
             urlClicks.ShortCode = shortCode;
 
             var url = await _shortener.ObtenerUrlOriginalAsync(urlClicks);

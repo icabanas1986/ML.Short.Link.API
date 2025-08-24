@@ -10,14 +10,14 @@ namespace ML.Short.Link.API.Services
         {
             _db = db;
         }
-        public async Task<int> InsertarUsuarioAsync(string email, string passwordHash)
+        public async Task<int> InsertarUsuarioAsync(string nombre, string email, string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(passwordHash))
             {
                 throw new ArgumentException("Email and password hash cannot be null or empty.");
             }
             ValidarUsuarioAsync(email, passwordHash).GetAwaiter().GetResult();
-            return await _db.RegistrarUsuarioAsync(email, passwordHash);
+            return await _db.RegistrarUsuarioAsync(nombre,email, passwordHash);
         }
         public async Task<bool> ValidarUsuarioAsync(string email, string passwordHash)
         {
