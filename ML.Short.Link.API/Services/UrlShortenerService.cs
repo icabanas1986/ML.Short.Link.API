@@ -46,5 +46,14 @@ namespace ML.Short.Link.API.Services
 
         }
 
+        public async Task<List<ShortUrl>> ObtieneUrlsUsuario(int idUser)
+        {
+            if (idUser <= 0)
+            {
+                throw new ArgumentException("Invalid user ID.");
+            }
+            return await _db.ObtieneUrlsPorUsuario(idUser);
+        }
+
     }
 }

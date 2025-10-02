@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ML.Short.Link.API.Data;
 using ML.Short.Link.API.Models;
 using ML.Short.Link.API.Services;
 
@@ -18,10 +17,27 @@ namespace ML.Short.Link.API.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ShortenUrl([FromBody] string originalUrl)
+        public async Task<IActionResult> ShortenUrl([FromBody] ShortUrlModel model)
         {
             
 
+            var shortCode = _shortener.GenerateShortCode();
+            var shortUrl = new ShortUrl
+            {
+                OriginalUrl = model.ShortUrl,
+                ShortCode = shortCode,
+                IdUser = model.idUser,
+            };
+
+            var idUrl = await _shortener.InsertaUrlAsync(shortUrl);
+
+            return Ok(new { shortUrl = $"https://sftl.io/{shortCode}" });
+        }
+
+        [HttpPost]
+        [Route("free")]
+        public async Task<IActionResult> Free([FromBody] string originalUrl)
+        {
             var shortCode = _shortener.GenerateShortCode();
             var shortUrl = new ShortUrl
             {
@@ -29,10 +45,16 @@ namespace ML.Short.Link.API.Controllers
                 ShortCode = shortCode,
                 IdUser = 1,
             };
-
             var idUrl = await _shortener.InsertaUrlAsync(shortUrl);
+            return Ok(new { shortUrl = $"https://sftl.io/{shortCode}" });
+        }
 
-            return Ok(new { shortUrl = $"https://lish.io/{shortCode}" });
+        [HttpGet]
+        [Route("list")]
+        public async Task<IActionResult> GetUrlsByUser(int idUser)
+        {
+            var urls = await _shortener.ObtieneUrlsUsuario(idUser);
+            return Ok(urls);
         }
     }
 }

@@ -55,12 +55,14 @@ namespace ML.Short.Link.API.Controllers
                 return Unauthorized("Credenciales inválidas.");
             }
 
+            var u = await _user.ObtieneUsuario(email);
+
             var token = _jwt.generaToken(email); // Genera el token JWT
 
-            return Ok(new { Token = token });
+            return Ok(new { jwt = token ,id= u.Id});
         }
 
-        [HttpPost("token")]
+        [HttpPost("generandoToken")]
         public async Task<IActionResult> GetUserToken(string email)
         {
             // Aquí iría la lógica para obtener el token del usuario
