@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace ML.Short.Link.API.Utils
+namespace ML.Short.Link.API.Utils.Services
 {
     public class PasswordHasher
     {

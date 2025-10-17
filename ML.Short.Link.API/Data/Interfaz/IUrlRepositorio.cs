@@ -11,5 +11,6 @@ namespace ML.Short.Link.API.Data.Interfaz
         Task<bool> ExisteUrlAsync(string shortCode);
 
             Task<List<ShortUrl>> ObtieneUrlsPorUsuario(int idUser);
+        Task<ShortUrl> ObtieneInfoUrlOriginalAsync(string shortCode);
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using ML.Short.Link.API.JWT;
 using ML.Short.Link.API.Services;
-using ML.Short.Link.API.Utils;
+using ML.Short.Link.API.Utils.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

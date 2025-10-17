@@ -49,6 +49,31 @@ namespace ML.Short.Link.API.Data.Service
             return result as string;
         }
 
+        public async Task<ShortUrl> ObtieneInfoUrlOriginalAsync(string shortCode)
+        {
+            ShortUrl url = null;
+            var query = "SELECT idUrl, UrlOriginal, UrlCorta, fecha_creacion, clicks, activa, UserId FROM Urls WHERE UrlCorta = @ShortCode";
+            using var command = new SqlCommand(query, _conn);
+            command.Parameters.AddWithValue("@ShortCode", shortCode);
+            await _conn.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                url = new ShortUrl
+                {
+                    Id = reader.GetInt32(0),
+                    OriginalUrl = reader.GetString(1),
+                    ShortCode = reader.GetString(2),
+                    CreatedAt = reader.GetDateTime(3),
+                    ClickCount = reader.GetInt32(4),
+                    Activa = reader.GetBoolean(5),
+                    IdUser = reader.GetInt32(6)
+                };
+            }
+            await _conn.CloseAsync();
+            return url;
+        }
+
         public async Task IncrementarClickCountAsync(string shortCode)
         {
             var query = "UPDATE Urls SET clicks = clicks + 1 WHERE UrlCorta = @ShortCode";

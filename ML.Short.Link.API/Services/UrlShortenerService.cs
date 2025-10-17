@@ -55,5 +55,20 @@ namespace ML.Short.Link.API.Services
             return await _db.ObtieneUrlsPorUsuario(idUser);
         }
 
+        public async Task<ShortUrl> ObtenerInfoUrlOriginalAsync(string shortCode)
+        {
+            if (string.IsNullOrWhiteSpace(shortCode))
+            {
+                throw new ArgumentException("Short code cannot be null or empty.");
+            }
+            var urlInfo = await _db.ObtieneInfoUrlOriginalAsync(shortCode);
+            if (urlInfo == null)
+            {
+                throw new KeyNotFoundException("Short code not found.");
+            }
+            return urlInfo;
+
+        }
+
     }
 }

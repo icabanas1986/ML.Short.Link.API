@@ -1,14 +1,17 @@
 ﻿using ML.Short.Link.API.Data.Interfaz;
 using ML.Short.Link.API.Models;
+using ML.Short.Link.API.Utils.Interface;
 
 namespace ML.Short.Link.API.Services
 {
     public class UserService
     {
         private readonly IUserRepositorio _db;
-        public UserService(IUserRepositorio db)
+        private readonly IEmailService _emailService;
+        public UserService(IUserRepositorio db, IEmailService emailService)
         {
             _db = db;
+            _emailService = emailService;
         }
         public async Task<int> InsertarUsuarioAsync(string email, string passwordHash)
         {
@@ -17,7 +20,14 @@ namespace ML.Short.Link.API.Services
                 throw new ArgumentException("Email and password hash cannot be null or empty.");
             }
             ValidarUsuarioAsync(email, passwordHash).GetAwaiter().GetResult();
-            return await _db.RegistrarUsuarioAsync(email, passwordHash);
+            var userId =  await _db.RegistrarUsuarioAsync(email, passwordHash);
+            if(userId > 0)
+            {
+                var token = _emailService.GenerateConfirmationToken();
+                var confirmationLink = $"https://yourdomain.com/confirm?token={token}&email={email}";
+                await _emailService.SendRegistrationConfirmationAsync(email, email, confirmationLink);
+            }
+            return userId;
         }
         public async Task<bool> ValidarUsuarioAsync(string email, string passwordHash)
         {

@@ -14,16 +14,24 @@ namespace ML.Short.Link.API.Data.Service
 
         public async Task<int> RegistrarUsuarioAsync(string email, string password)
         {
-            var query = "INSERT INTO Users (Email, PasswordHash, CreatedAt) " +
+            try
+            {
+                var query = "INSERT INTO Users (Email, PasswordHash, CreatedAt) " +
                         "OUTPUT INSERTED.Id VALUES (@Email, @Password, @FechaRegistro)";
-            using var command = new SqlCommand(query, _conn);
-            command.Parameters.AddWithValue("@Email", email);
-            command.Parameters.AddWithValue("@Password", password); // Consider hashing the password
-            command.Parameters.AddWithValue("@FechaRegistro", DateTime.UtcNow);
-            await _conn.OpenAsync();
-            var id = (int)await command.ExecuteScalarAsync();
-            await _conn.CloseAsync();
-            return id;
+                using var command = new SqlCommand(query, _conn);
+                command.Parameters.AddWithValue("@Email", email);
+                command.Parameters.AddWithValue("@Password", password); // Consider hashing the password
+                command.Parameters.AddWithValue("@FechaRegistro", DateTime.UtcNow);
+                await _conn.OpenAsync();
+                var id = (int)await command.ExecuteScalarAsync();
+                await _conn.CloseAsync();
+                return id;
+            }
+            catch (Exception ex)
+            {
+                var msg = ex.Message;
+                return 0;
+            }
         }
         public async Task<bool> ValidarUsuarioAsync(string email, string password)
         {
