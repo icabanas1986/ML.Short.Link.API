@@ -48,7 +48,7 @@ namespace ML.Short.Link.API.Services
                 var deviceInfo = await deviceInfoTask;
 
                 urlClick.UrlId = urlClicks.Id;
-                urlClick.ClicketAt = DateTime.UtcNow;
+                urlClick.ClickedAt = DateTime.UtcNow;
                 urlClick.IPAddress = ipAddress;
                 urlClick.UserAgent = userAgent;
 

@@ -6,7 +6,7 @@ namespace ML.Short.Link.API.Models
     {
         public int Id { get; set; }
         public int UrlId { get; set; }
-        public DateTime ClicketAt { get; set; }
+        public DateTime ClickedAt { get; set; }
         public string IPAddress { get; set; }
         public string UserAgent { get; set; }
         // Geolocalización extendida

@@ -57,6 +57,7 @@ builder.Services.AddScoped<UrlClickServices>();
 builder.Services.AddScoped<IUrlRepositorio, UrlRepositorio>();
 builder.Services.AddScoped<IUserRepositorio, UserRepositorio>();
 builder.Services.AddScoped<IUrlClicksRepository, UrlClicksRepository>();
+builder.Services.AddScoped<StatsServices>();
 
 builder.Services.AddHttpClient<IGeoLocationService, GeoLocationService>();
 // Servicios de la aplicación
@@ -98,7 +99,6 @@ builder.Services.AddSwaggerGen(c => {
         }
     });
 });
-
 
 
 //JWT
